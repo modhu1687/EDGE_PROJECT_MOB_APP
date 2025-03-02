@@ -1,7 +1,7 @@
 <<<<<<< HEAD
-# demo-calculator
+# EDGE_PROJECT_MOB_APP
 =======
-# demo_calc
+# EDGE_PROJECT_MOB_APP
 
 A new Flutter project.
 
