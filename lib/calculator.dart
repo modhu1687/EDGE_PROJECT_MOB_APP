@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 class Calculator extends StatefulWidget {
   const Calculator({super.key});
@@ -18,14 +18,25 @@ class _CalculatorState extends State<Calculator> {
         displayText = '0';
         expression = '';
       } else if (value == '=') {
-        displayText = expression;
-        expression = '';
+        try {
+          Parser p = Parser();
+          Expression exp = p.parse(expression);
+          ContextModel cm = ContextModel();
+          double eval = exp.evaluate(EvaluationType.REAL, cm);
+          displayText = eval.toString();
+          expression = displayText;
+        } catch (e) {
+          displayText = 'Error';
+          expression = '';
+        }
       } else if (value == '-/') {
         if (displayText != '0') {
           if (displayText.startsWith('-')) {
             displayText = displayText.substring(1);
+            expression = expression.startsWith('-') ? expression.substring(1) : expression;
           } else {
             displayText = '-$displayText';
+            expression = '-$expression';
           }
         }
       } else if (value == 'D') {
@@ -42,6 +53,9 @@ class _CalculatorState extends State<Calculator> {
       } else if (value == 'x') {
         expression += '*';
         displayText = expression;
+      } else if (value == '%') {
+        expression += '/100*';
+        displayText = expression;
       } else {
         if (displayText == '0') {
           displayText = value;
@@ -56,6 +70,7 @@ class _CalculatorState extends State<Calculator> {
 
   Widget calcbutton(String btntxt, Color btncolor, Color txtcolor) {
     return Container(
+      margin: const EdgeInsets.all(8.0),
       child: ElevatedButton(
         onPressed: () {
           _updateDisplay(btntxt);
@@ -94,7 +109,7 @@ class _CalculatorState extends State<Calculator> {
       ),
       backgroundColor: Colors.cyan[900],
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.end,
@@ -104,7 +119,7 @@ class _CalculatorState extends State<Calculator> {
               alignment: Alignment.bottomRight,
               child: Text(
                 displayText,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 80,
                   color: Colors.yellow,
                   fontWeight: FontWeight.bold,
